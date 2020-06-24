@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Blog.Database.Abstract;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
 namespace Blog.Database.Concrete
@@ -16,6 +18,11 @@ namespace Blog.Database.Concrete
             MongoClient client = new MongoClient(settings.ConnectionString);
             var db = client.GetDatabase(settings.Database);
             _mongoCollection = db.GetCollection<T>(settings.Collection);
+        }
+
+        public IQueryable<T> Query()
+        {
+            return _mongoCollection.AsQueryable();
         }
 
         public async Task<bool> CreateAsync(T model)
@@ -72,10 +79,19 @@ namespace Blog.Database.Concrete
             }
         }
 
-        public void Delete(string id)
+        public bool Delete(string id)
         {
-            var docId = new ObjectId(id);
-            _mongoCollection.DeleteOne(Builders<T>.Filter.Eq("_id", docId));
+            try
+            {
+                var docId = new ObjectId(id);
+                _mongoCollection.DeleteOne(Builders<T>.Filter.Eq("_id", docId));
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Someting went wrong: ", e);
+                return false;
+            }
         }
 
         public T GetById(string id)
@@ -92,10 +108,19 @@ namespace Blog.Database.Concrete
             }
         }
 
-        public void Update(string id, T model)
+        public bool Update(string id, T model)
         {
-            var docId = new ObjectId(id);
-            _mongoCollection.ReplaceOne(Builders<T>.Filter.Eq("_id", docId), model);
+            try
+            {
+                var docId = new ObjectId(id);
+                _mongoCollection.ReplaceOne(Builders<T>.Filter.Eq("_id", docId), model);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Someting went wrong: ", e);
+                return false;
+            }
         }
 
         public List<T> GetAll()

@@ -2,12 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Blog.Business;
+using Blog.Business.Abstract;
+using Blog.Business.Concrete;
+using Blog.Database.Abstract;
+using Blog.Database.Concrete;
+using Blog.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace Blog.UI
 {
@@ -23,6 +30,11 @@ namespace Blog.UI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.BlogRepositories();
+            services.BlogServices();
+            //Binding "MongoDbSettings" which is in appsettings.json to MongoDbSetting model
+            services.Configure<MongoDbSettings>(Configuration.GetSection("MongoVariables"));
+            services.AddSingleton<IMongoDbSettings>(sp => sp.GetRequiredService<IOptions<MongoDbSettings>>().Value);
             services.AddControllersWithViews();
         }
 
@@ -51,7 +63,7 @@ namespace Blog.UI
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Article}/{action=Index}/{id?}");
             });
         }
     }
