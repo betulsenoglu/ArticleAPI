@@ -32,4 +32,4 @@ yazabilir misiniz?**
   
 **- Daha geniş vaktiniz olsaydı projeye neler eklemek isterdiniz?**
 
-  Projede sunulan dataların cache mekanizması üzerindne sağlanması için geliştirme yapardım. Şimdilik REDIS Entegrasyonu bulunmakta fakat uygulanabilmesi için vakit kısıtlı kaldığından uygulanmadı. Bunun dışında dökümantasyon için devamlılığı sağlamak adına projeye entegre olabilecek tool kullanılabilir, swagger vs. gibi. Aynı zamanda API uçlarından Article modelinin tümünü sunmak yerine istek doğrultusunda gerekli alanları endpointler ve mapping katmanı ile birlikte sunabilirdim.
+  Projede sunulan dataların cache mekanizması üzerindne sağlanması için geliştirme yapardım. Şimdilik REDIS Entegrasyonu bulunmakta fakat uygulanabilmesi için vakit kısıtlı kaldığından uygulanmadı. Bunun dışında dökümantasyon için devamlılığı sağlamak adına projeye entegre olabilecek tool kullanılabilir, swagger vs. gibi. Aynı zamanda API uçlarından Article modelinin tümünü sunmak yerine istek doğrultusunda gerekli alanları endpointler ve mapping katmanı ile birlikte sunabilirdim. Ek olarak, HTTP response 204, 404 düzenlemeleri de sağlayabilirdim.
