@@ -11,11 +11,6 @@ $ mongod --dbpath=/Users/user/data/db
 $ brew services start mongodb-community
 
 
-**CREATE MONGO Database :**
-
-$ use BlogDB
-
-
 **PROJECT API DOCUMENTATION : https://documenter.getpostman.com/view/7420314/SzzrYE1M?version=latest**
 
 
