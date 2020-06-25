@@ -20,6 +20,7 @@ $ use BlogDB
 
 
 ***Sorular:***
+
 **- Projede kullanıdığınız tasarım desenleri hangileridir? Bu desenleri neden kullandınız?**
 
   Projede database context oluşumu operasyonunda singleton pattern kullanılmıştır. Böylece uygulama lifecycle boyunca tek bir nesne üzerinden sorgulama yapmıştır.
