@@ -11,5 +11,4 @@ namespace Blog.Cache.Redis.Abstract
         bool ContainsKey(string cachekey);
         void Clear<T>(string cachekey);
     }
-    
 }

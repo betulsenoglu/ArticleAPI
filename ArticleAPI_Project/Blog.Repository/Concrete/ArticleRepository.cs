@@ -29,7 +29,8 @@ namespace Blog.Repository.Concrete
             if (!string.IsNullOrWhiteSpace(key))
             {
                 cursor = _mongoCollection.AsQueryable().Where(x => x.Status == 0 &&
-                                                                   (x.Text.ToLower().Contains(key.ToLower()) || x.Title.ToLower().Contains(key.ToLower()) ||
+                                                                   (x.Text.ToLower().Contains(key.ToLower()) ||
+                                                                    x.Title.ToLower().Contains(key.ToLower()) ||
                                                                     x.Description.ToLower().Contains(key.ToLower())));
             }
 
