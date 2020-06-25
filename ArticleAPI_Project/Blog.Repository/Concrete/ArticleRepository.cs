@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blog.Database.Abstract;
 using Blog.Database.Concrete;
+using Blog.Domain.Entities.Enums;
 using Blog.Domain.Entities.Models.Article;
 using Blog.Repository.Abstract;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
@@ -26,12 +29,29 @@ namespace Blog.Repository.Concrete
             if (!string.IsNullOrWhiteSpace(key))
             {
                 cursor = _mongoCollection.AsQueryable().Where(x => x.Status == 0 &&
-                                                                   (x.Text.Contains(key) || x.Title.Contains(key) ||
-                                                                    x.Description.Contains(key)));
+                                                                   (x.Text.ToLower().Contains(key.ToLower()) || x.Title.ToLower().Contains(key.ToLower()) ||
+                                                                    x.Description.ToLower().Contains(key.ToLower())));
             }
 
             var results = cursor != null ? await cursor.ToListAsync() : null;
             return results;
+        }
+
+
+        public async Task<bool> DeleteViaUpdate(string id)
+        {
+            try
+            {
+                var filter = Builders<Article>.Filter.Eq("_Id", id);
+                var update = Builders<Article>.Update.Set("Status", Status.Deleted).Set("UpdatedDate", DateTime.Now);
+                await _mongoCollection.UpdateOneAsync(filter, update);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Someting went wrong: ", e);
+                return false;
+            }
         }
     }
 }

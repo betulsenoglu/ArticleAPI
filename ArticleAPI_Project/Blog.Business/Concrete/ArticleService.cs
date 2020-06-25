@@ -4,19 +4,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Blog.Business.Abstract;
+using Blog.Cache.Models;
+using Blog.Cache.Redis.Abstract;
+using Blog.Core.IoCHandler;
 using Blog.Domain.Definitions.Responses;
+using Blog.Domain.Entities.Enums;
 using Blog.Domain.Entities.Models.Article;
 using Blog.Repository.Abstract;
 
 namespace Blog.Business.Concrete
 {
+    // ToDo : Implementation of REDIS Cache
     public class ArticleService : IArticleService
     {
         private readonly IArticleRepository _articleRepo;
-
-        public ArticleService(IArticleRepository articleRepo)
+        private IRedisCacheService _cache;
+        public ArticleService(IArticleRepository articleRepo, IRedisCacheService cache)
         {
             _articleRepo = articleRepo;
+            _cache = cache;
         }
 
         public async Task<ServiceResponse<List<Article>>> GetAllAsync()
@@ -29,8 +35,8 @@ namespace Blog.Business.Concrete
                 result = _articleRepo.Query().Where(x => x.Status == 0).OrderByDescending(x => x.CreatedDate)
                     .ThenBy(x => x._Id)
                     .ToList();
-                // result = await _articleRepo.GetAllAsync();
 
+                // result = await _articleRepo.GetAllAsync();
                 message = result.Count > 0 ? "Successfully Completed!" : "Content Not Found!";
                 status = true;
             }
@@ -56,9 +62,9 @@ namespace Blog.Business.Concrete
             Article result = null;
             try
             {
-                result = _articleRepo.GetByIdAsync(id).Result;
-                message = "Successfully Completed!";
-                status = true;
+                result = !string.IsNullOrWhiteSpace(id) ? _articleRepo.GetByIdAsync(id).Result : null;
+                message = result != null ? "Successfully Completed!" : "Content Not Found!";
+                status = result != null;
             }
             catch (Exception e)
             {
@@ -80,9 +86,11 @@ namespace Blog.Business.Concrete
             bool status;
             string message;
             IList<Article> result = null;
+            var articleService = ServiceCollectionManager.CurrentInstance.Resolve<IArticleRepository>(); // Info : Dependency Injected by IOC Container
+
             try
             {
-                result = _articleRepo.SearchInArticlesAsync(key).Result;
+                result = articleService.SearchInArticlesAsync(key).Result;
                 message = result.Count > 0 ? "Successfully Completed!" : "Content Not Found!";
                 status = true;
             }
@@ -106,10 +114,28 @@ namespace Blog.Business.Concrete
             bool status;
             string message;
             bool result = false;
+            Article entity = null;
             try
             {
-                result = model != null && !string.IsNullOrWhiteSpace(model.Url) &&
-                         !string.IsNullOrWhiteSpace(model.Title) && await _articleRepo.CreateAsync(model);
+                if (model != null)
+                {
+                    entity = new Article()
+                    {
+                        Title = !string.IsNullOrWhiteSpace(model.Title) ? model.Title : string.Empty,
+                        Description = !string.IsNullOrWhiteSpace(model.Description) ? model.Description : string.Empty,
+                        Text = !string.IsNullOrWhiteSpace(model.Text) ? model.Text : string.Empty,
+                        Url = !string.IsNullOrWhiteSpace(model.Url) ? model.Url : string.Empty,
+                        Writers = model.Writers != null && model.Writers.Count > 0 ? model.Writers : null,
+                        Sources = model.Sources != null && model.Sources.Count > 0 ? model.Sources : null,
+                        Status = Status.Active,
+                        CreatedDate = DateTime.Now
+                    };
+                }
+
+                if (entity != null)
+                    result = !string.IsNullOrWhiteSpace(entity.Url) &&
+                             !string.IsNullOrWhiteSpace(entity.Title) && await _articleRepo.CreateAsync(entity);
+
                 message = result ? "Successfully Completed!" : "Content Not Found!";
                 status = result;
             }
@@ -122,7 +148,7 @@ namespace Blog.Business.Concrete
 
             return new ServiceResponse<Article>()
             {
-                Data = result ? model : null,
+                Data = result ? entity : null,
                 Message = message,
                 Status = status ? "success" : "fail"
             };
@@ -135,9 +161,19 @@ namespace Blog.Business.Concrete
             Article result = null;
             try
             {
-                result = await _articleRepo.UpdateAsync(id, model);
-                message = result != null ? "Successfully Completed!" : "Content Not Found!";
-                status = true;
+                if (!string.IsNullOrWhiteSpace(model.Url) &&
+                    !string.IsNullOrWhiteSpace(model.Title) && !string.IsNullOrWhiteSpace(id))
+                {
+                    model.UpdatedDate = DateTime.Now;
+                    result = await _articleRepo.UpdateAsync(id, model);
+                    message = result != null ? "Successfully Completed!" : "Content Not Found!";
+                    status = true;
+                }
+                else
+                {
+                    message = "Content Not Found!";
+                    status = false;
+                }
             }
             catch (Exception e)
             {
@@ -161,9 +197,17 @@ namespace Blog.Business.Concrete
             bool result = false;
             try
             {
-                result = await _articleRepo.DeleteAsync(id);
-                message = result ? "Successfully Completed!" : "Content Not Found!";
-                status = true;
+                if (!string.IsNullOrWhiteSpace(id))
+                {
+                    result = await _articleRepo.DeleteAsync(id);
+                    message = result ? "Successfully Completed!" : "Content Not Found!";
+                    status = true;
+                }
+                else
+                {
+                    message = "Content Not Found!";
+                    status = false;
+                }
             }
             catch (Exception e)
             {
@@ -187,10 +231,10 @@ namespace Blog.Business.Concrete
             List<Article> result = null;
             try
             {
-                result = _articleRepo.Query().Where(x => x.Status == 0).OrderByDescending(x => x.CreatedDate)
-                    .ThenBy(x => x._Id)
-                    .ToList();
-                // result = await _articleRepo.GetAll();
+                // result = _articleRepo.Query().Where(x => x.Status == 0).OrderByDescending(x => x.CreatedDate)
+                //     .ThenBy(x => x._Id)
+                //     .ToList();
+                result = _articleRepo.GetAll();
 
                 message = result.Count > 0 ? "Successfully Completed!" : "Content Not Found!";
                 status = true;
@@ -244,6 +288,32 @@ namespace Blog.Business.Concrete
             try
             {
                 result = _articleRepo.Update(id, model);
+                message = result ? "Successfully Completed!" : "Content Not Found!";
+                status = true;
+            }
+            catch (Exception e)
+            {
+                status = false;
+                message = "An Error Occured!";
+                // ToDo : logging
+            }
+
+            return new ServiceResponse<bool>()
+            {
+                Data = result,
+                Message = message,
+                Status = status ? "success" : "fail"
+            };
+        }
+
+        public async Task<ServiceResponse<bool>> DeleteViaUpdate(string id)
+        {
+            bool status;
+            string message;
+            bool result = false;
+            try
+            {
+                result = await _articleRepo.DeleteViaUpdate(id);
                 message = result ? "Successfully Completed!" : "Content Not Found!";
                 status = true;
             }

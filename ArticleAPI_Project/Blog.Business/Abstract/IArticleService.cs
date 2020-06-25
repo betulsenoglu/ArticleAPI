@@ -12,6 +12,7 @@ namespace Blog.Business.Abstract
         Task<ServiceResponse<IList<Article>>> SearchInArticles(string keyword);
         Task<ServiceResponse<Article>> CreateAsync(Article model);
         Task<ServiceResponse<Article>> UpdateAsync(string id, Article model);
+        Task<ServiceResponse<bool>> DeleteViaUpdate(string id);
         Task<ServiceResponse<bool>> DeleteAsync(string id);
         ServiceResponse<List<Article>> GetAll();
         ServiceResponse<Article> GetById(string id);

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Blog.Business;
 using Blog.Business.Abstract;
 using Blog.Business.Concrete;
+using Blog.Core.IoCHandler;
 using Blog.Database.Abstract;
 using Blog.Database.Concrete;
 using Blog.Repository;
@@ -15,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace Blog.UI
 {
@@ -36,6 +38,8 @@ namespace Blog.UI
             services.Configure<MongoDbSettings>(Configuration.GetSection("MongoVariables"));
             services.AddSingleton<IMongoDbSettings>(sp => sp.GetRequiredService<IOptions<MongoDbSettings>>().Value);
             services.AddControllersWithViews();
+            ServiceCollectionManager.Initialize(services);
+            // DependencyConfiguration.RegisterDependencies(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,6 +69,8 @@ namespace Blog.UI
                     name: "default",
                     pattern: "{controller=Article}/{action=Index}/{id?}");
             });
+            
         }
     }
+    
 }

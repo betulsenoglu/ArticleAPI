@@ -30,7 +30,7 @@ namespace Blog.Domain.Entities.Models.Article
         public virtual string Text { get; set; }
 
         /// <summary>
-        /// Url of the Article. Default : Slugified, SEO Friendly Article Title
+        /// Url of the Article
         /// </summary>
         [BsonIgnoreIfNull]
         [DataMember]
