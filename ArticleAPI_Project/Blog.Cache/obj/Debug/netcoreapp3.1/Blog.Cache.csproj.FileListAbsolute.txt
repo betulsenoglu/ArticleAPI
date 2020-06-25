@@ -1,0 +1,8 @@
+/Users/betulsenoglu/Desktop/Projects/ArticleAPI_case/ArticleAPI_Project/Blog.Cache/bin/Debug/netcoreapp3.1/Blog.Cache.deps.json
+/Users/betulsenoglu/Desktop/Projects/ArticleAPI_case/ArticleAPI_Project/Blog.Cache/bin/Debug/netcoreapp3.1/Blog.Cache.dll
+/Users/betulsenoglu/Desktop/Projects/ArticleAPI_case/ArticleAPI_Project/Blog.Cache/bin/Debug/netcoreapp3.1/Blog.Cache.pdb
+/Users/betulsenoglu/Desktop/Projects/ArticleAPI_case/ArticleAPI_Project/Blog.Cache/obj/Debug/netcoreapp3.1/Blog.Cache.csprojAssemblyReference.cache
+/Users/betulsenoglu/Desktop/Projects/ArticleAPI_case/ArticleAPI_Project/Blog.Cache/obj/Debug/netcoreapp3.1/Blog.Cache.AssemblyInfoInputs.cache
+/Users/betulsenoglu/Desktop/Projects/ArticleAPI_case/ArticleAPI_Project/Blog.Cache/obj/Debug/netcoreapp3.1/Blog.Cache.AssemblyInfo.cs
+/Users/betulsenoglu/Desktop/Projects/ArticleAPI_case/ArticleAPI_Project/Blog.Cache/obj/Debug/netcoreapp3.1/Blog.Cache.dll
+/Users/betulsenoglu/Desktop/Projects/ArticleAPI_case/ArticleAPI_Project/Blog.Cache/obj/Debug/netcoreapp3.1/Blog.Cache.pdb
